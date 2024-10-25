@@ -1,0 +1,86 @@
+-- CreateTable
+CREATE TABLE `User` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `telegramId` BIGINT UNSIGNED NOT NULL,
+    `firstName` VARCHAR(128) NULL,
+    `lastName` VARCHAR(128) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `User_telegramId_key`(`telegramId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Game` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(256) NOT NULL,
+    `type` VARCHAR(128) NULL,
+    `Iteration` INTEGER UNSIGNED NULL,
+    `startAt` TIMESTAMP NULL,
+    `endAt` TIMESTAMP NULL,
+    `rewardType` VARCHAR(128) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Event` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(256) NOT NULL,
+    `type` VARCHAR(128) NOT NULL,
+    `shortDescription` VARCHAR(256) NULL,
+    `longDescription` TEXT NULL,
+    `startAt` TIMESTAMP NULL,
+    `endAt` TIMESTAMP NULL,
+    `duration` INTEGER UNSIGNED NULL,
+    `location` VARCHAR(256) NULL,
+    `attending_link` VARCHAR(256) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UserEvent` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(256) NOT NULL,
+    `firstName` VARCHAR(128) NOT NULL,
+    `lastName` VARCHAR(128) NOT NULL,
+    `university` VARCHAR(128) NULL,
+    `major` VARCHAR(128) NULL,
+    `UserId` INTEGER UNSIGNED NOT NULL,
+    `EventId` INTEGER UNSIGNED NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UserGame` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `UserId` INTEGER UNSIGNED NOT NULL,
+    `GameId` INTEGER UNSIGNED NOT NULL,
+    `reward` INTEGER UNSIGNED NOT NULL DEFAULT 0,
+    `response` JSON NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `UserEvent` ADD CONSTRAINT `UserEvent_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UserEvent` ADD CONSTRAINT `UserEvent_EventId_fkey` FOREIGN KEY (`EventId`) REFERENCES `Event`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UserGame` ADD CONSTRAINT `UserGame_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UserGame` ADD CONSTRAINT `UserGame_GameId_fkey` FOREIGN KEY (`GameId`) REFERENCES `Game`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
