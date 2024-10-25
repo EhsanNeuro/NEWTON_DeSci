@@ -1,4 +1,5 @@
 import { PaginationDto } from '@app/general/general.dto';
+import { UserReferralDto } from '@app/user/dto/userReferral.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsISO8601, IsOptional } from 'class-validator';
 
@@ -23,11 +24,9 @@ export class GetUserReferralsHistoryRes {
   constructor(data: GetUserReferralsHistoryRes) {
     Object.assign(data, this);
   }
-  Friend: {
-    firstName?: string | null;
-    lastName?: string | null;
-  };
-  reward: number;
-  createdAt: string;
-  updatedAt: string;
+  @ApiProperty({
+    type: () => UserReferralDto,
+    isArray: true,
+  })
+  result: UserReferralDto[];
 }

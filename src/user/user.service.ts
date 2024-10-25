@@ -47,16 +47,8 @@ export class UserService {
       filters,
     );
 
-    return userGameHistory.map(
-      (item) =>
-        new GetUserGameHistoryRes({
-          ...item,
-          createdAt: item.createdAt.toISOString(),
-          updatedAt: item.updatedAt.toISOString(),
-        }),
-    );
+    return new GetUserGameHistoryRes({ result: userGameHistory });
   }
-
 
   async getUserEventHistory(userId: number, filters: GetUserGameHistoryDto) {
     const userEventHistory = await this.userRepo.findUserEventByQuery(
@@ -64,30 +56,14 @@ export class UserService {
       filters,
     );
 
-    return userEventHistory.map(
-      (item) =>
-        new GetUserEventHistoryRes({
-          ...item,
-          createdAt: item.createdAt.toISOString(),
-          updatedAt: item.updatedAt.toISOString(),
-        }),
-    );
+    return new GetUserEventHistoryRes({ result: userEventHistory });
   }
 
-
-  async getUserReferrals  (userId: number, filters: GetUserGameHistoryDto) {
+  async getUserReferrals(userId: number, filters: GetUserGameHistoryDto) {
     const userReferralsHistory = await this.userRepo.findUserReferralsByQuery(
       userId,
       filters,
     );
-
-    return userReferralsHistory.map(
-      (item) =>
-        new GetUserReferralsHistoryRes({
-          ...item,
-          createdAt: item.createdAt.toISOString(),
-          updatedAt: item.updatedAt.toISOString(),
-        }),
-    );
+    return new GetUserReferralsHistoryRes({ result: userReferralsHistory });
   }
 }

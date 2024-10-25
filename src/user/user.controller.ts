@@ -1,13 +1,17 @@
 import { Controller, Get, Query, Req } from '@nestjs/common';
-import { UserService } from './user.service';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
-import { GetUserGameHistoryDto } from '@app/user/dto/getUserGameHistory.dto';
+import {
+  GetUserGameHistoryDto,
+  GetUserGameHistoryRes,
+} from '@app/user/dto/getUserGameHistory.dto';
 import {
   GetUserEventHistoryDto,
   GetUserEventHistoryRes,
 } from '@app/user/dto/getUserEventHistory.dto';
 import { GetMeResponse } from '@app/user/dto/getMe.dto';
+import { GetUserReferralsHistoryRes } from '@app/user/dto/getUserReferrals.dto';
+import { UserService } from '@app/user/user.service';
 @ApiTags('User')
 @Controller('user')
 export class UserController {
@@ -16,12 +20,17 @@ export class UserController {
   @ApiOkResponse({
     type: () => GetMeResponse,
   })
+  @ApiOperation({ summary: 'Get user information.' })
   @Get('/me')
   getUserInformation(@Req() req: FastifyRequest) {
     return this.userService.getUserInformation(req.user.id);
   }
 
   @Get('/game-history')
+  @ApiOperation({ summary: 'Get user played games history.' })
+  @ApiOkResponse({
+    type: () => GetUserGameHistoryRes,
+  })
   getUserGameHistory(
     @Req() req: FastifyRequest,
     @Query() query: GetUserGameHistoryDto,
@@ -30,6 +39,7 @@ export class UserController {
   }
 
   @Get('/event-history')
+  @ApiOperation({ summary: 'Get user attended events history.' })
   @ApiOkResponse({
     type: () => GetUserEventHistoryRes,
   })
@@ -41,6 +51,10 @@ export class UserController {
   }
 
   @Get('/referral')
+  @ApiOperation({ summary: 'Get user friends.' })
+  @ApiOkResponse({
+    type: () => GetUserReferralsHistoryRes,
+  })
   getUserReferrals(
     @Req() req: FastifyRequest,
     @Query() query: GetUserEventHistoryDto,

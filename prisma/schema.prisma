@@ -31,7 +31,7 @@ model Game {
   id         Int        @id @default(autoincrement()) @db.UnsignedInt
   name       String     @db.VarChar(256)
   type       String     @db.VarChar(128)
-  iteration  Int        @db.UnsignedInt @default(0)
+  iteration  Int        @default(0) @db.UnsignedInt
   startAt    DateTime   @db.Timestamp()
   endAt      DateTime   @db.Timestamp()
   rewardType String     @db.VarChar(128)
@@ -47,8 +47,8 @@ model Event {
   type             String      @db.VarChar(128)
   shortDescription String?     @db.VarChar(256)
   longDescription  String?     @db.Text
-  startAt          DateTime?   @db.Timestamp()
-  endAt            DateTime?   @db.Timestamp()
+  startAt          DateTime    @db.Timestamp()
+  endAt            DateTime    @db.Timestamp()
   duration         Int?        @db.UnsignedInt()
   location         String?     @db.VarChar(256)
   attending_link   String?     @db.VarChar(256)
@@ -63,7 +63,7 @@ model UserEvent {
   email      String  @db.VarChar(256)
   firstName  String  @db.VarChar(128)
   lastName   String  @db.VarChar(128)
-  university String? @db.VarChar(128)
+  university String? @db.VarChar(255)
   major      String? @db.VarChar(128)
   UserId     Int     @db.UnsignedInt
   User       User    @relation(fields: [UserId], references: [id], onDelete: Cascade)

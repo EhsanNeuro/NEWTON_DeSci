@@ -1,4 +1,5 @@
 import { colors, ColorsType } from '@app/utility/logger/color';
+import { WinstonModuleOptions } from 'nest-winston';
 import { transports, format } from 'winston';
 const { combine, timestamp, errors, simple, printf } = format;
 
@@ -41,7 +42,7 @@ const createCustomFormat = (colors: ColorsType) => {
 };
 
 const objectStringFormat = createCustomFormat(colors);
-export const winstonConfig: any = {
+export const winstonConfig: WinstonModuleOptions = {
   format: combine(timestamp(), errors({ stack: true }), simple()),
   exitOnError: false,
   transports: [

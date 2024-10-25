@@ -3,8 +3,7 @@ import { ITelegramUser } from '@app/auth/auth.interface';
 import { LoginUserDto } from '@app/auth/dto/loginUser.dto';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { generateError } from '@app/utility/error/errorGenerator';
-import { HttpService } from '@app/utility/http/http.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
@@ -69,7 +68,7 @@ export class AuthService {
         'NOT_FOUND',
       );
     }
-    let { token, expirationTime } = this.authHelper.getJwtToken(user);
+    const { token, expirationTime } = this.authHelper.getJwtToken(user);
 
     return {
       access_token: token,

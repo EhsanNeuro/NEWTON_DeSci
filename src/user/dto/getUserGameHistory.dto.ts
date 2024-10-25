@@ -1,7 +1,6 @@
 import { PaginationDto } from '@app/general/general.dto';
+import { UserGameDto } from '@app/user/dto/userGame.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Game } from '@prisma/client';
-import { JsonValue } from '@prisma/client/runtime/library';
 import { IsISO8601, IsOptional } from 'class-validator';
 
 export class GetUserGameHistoryDto extends PaginationDto {
@@ -25,9 +24,10 @@ export class GetUserGameHistoryRes {
   constructor(data: GetUserGameHistoryRes) {
     Object.assign(data, this);
   }
-  Game: Game;
-  reward: number;
-  response: JsonValue;
-  createdAt: string;
-  updatedAt: string;
+
+  @ApiProperty({
+    type: () => UserGameDto,
+    isArray: true,
+  })
+  result: UserGameDto[];
 }

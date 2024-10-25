@@ -10,3 +10,18 @@ export class LoginUserDto {
   @IsNotEmpty()
   initData: string;
 }
+export class LoginUserRes {
+  constructor(data: LoginUserRes) {
+    Object.assign(data, this);
+  }
+  @ApiProperty({
+    type: 'string',
+    required: true,
+  })
+  access_token: string;
+  @ApiProperty({
+    type: 'string',
+    required: true,
+  })
+  expirationTime: number;
+}

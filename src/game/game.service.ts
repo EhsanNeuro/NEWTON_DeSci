@@ -1,6 +1,6 @@
 import { GameRepository } from '@app/database/repositories/game/game.repository';
 import { AdminCreateGameDto } from '@app/game/dto/adminCreateGame.dto';
-import { GetActiveGames } from '@app/game/dto/GetActiveGames.dto';
+import { GetActiveGames } from '@app/game/dto/getActiveGames.dto';
 import { UserPlayGameDto } from '@app/game/dto/userPlayGame.dto';
 import { generateError } from '@app/utility/error/errorGenerator';
 import { Injectable } from '@nestjs/common';

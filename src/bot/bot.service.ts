@@ -92,7 +92,7 @@ export class BotService {
               .catch((err) => {
                 Logger.error(
                   `Create referral User failed. referralToken = ${referralToken}`,
-                  err
+                  err,
                 );
               });
           }

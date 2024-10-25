@@ -1,31 +1,33 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { GameService } from './game.service';
-import { AdminCreateGameDto } from '@app/game/dto/adminCreateGame.dto';
 import { UserPlayGameDto } from '@app/game/dto/userPlayGame.dto';
 import { FastifyRequest } from 'fastify';
 import {
   ApiCreatedResponse,
-  ApiNoContentResponse,
   ApiOkResponse,
+  ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
-import { GetActiveGames } from '@app/game/dto/GetActiveGames.dto';
-
+import { GetActiveGames } from '@app/game/dto/getActiveGames.dto';
+import { GameService } from '@app/game/game.service';
+@ApiTags('Game')
 @Controller('game')
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
-  @Post('/')
-  adminCreateGame(@Body() body: AdminCreateGameDto) {
-    return this.gameService.adminCreateGame(body);
-  }
+  // @Post('/')
+  // adminCreateGame(@Body() body: AdminCreateGameDto) {
+  //   return this.gameService.adminCreateGame(body);
+  // }
 
   @Post('/play')
   @ApiCreatedResponse()
+  @ApiOperation({ summary: 'User plays an game.' })
   userPlayGame(@Req() req: FastifyRequest, @Body() body: UserPlayGameDto) {
     return this.gameService.userPlayGame(req.user.id, body);
   }
 
-  @Get('/active-game')
+  @Get('/active')
+  @ApiOperation({ summary: 'Get All active games.' })
   @ApiOkResponse({
     type: () => GetActiveGames,
   })

@@ -1,15 +1,21 @@
 import { CustomError, IErrorForm } from '@app/utility/error/errorGenerator';
 import { HttpService } from '@app/utility/http/http.service';
-import { ArgumentsHost, BadRequestException, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  BadRequestException,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { FastifyReply } from 'fastify';
 import { env } from 'process';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly logger: Logger) {}
 
   async catch(exception: HttpException, host: ArgumentsHost) {
     // eslint-disable-next-line no-console
@@ -18,7 +24,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof CustomError) {
       this.logger.log(exception);
-      return HttpService.UnsuccessfulResponse(res, exception.error.errors, exception.error.status);
+      return HttpService.UnsuccessfulResponse(
+        res,
+        exception.error.errors,
+        exception.error.status,
+      );
     }
 
     if (exception instanceof PrismaClientKnownRequestError) {
@@ -85,6 +95,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return HttpService.UnsuccessfulResponse(res, errors, 'BAD_REQUEST');
     }
 
-    return HttpService.UnsuccessfulResponse(res, [{ message: exception.message }], 'INTERNAL_SERVER_ERROR');
+    return HttpService.UnsuccessfulResponse(
+      res,
+      [{ message: exception.message }],
+      'INTERNAL_SERVER_ERROR',
+    );
   }
 }
