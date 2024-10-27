@@ -22,7 +22,7 @@ export class GetUserEventHistoryDto extends PaginationDto {
 }
 export class GetUserEventHistoryRes {
   constructor(data: GetUserEventHistoryRes) {
-    Object.assign(data, this);
+    Object.assign(this, data);
   }
 
   @ApiProperty({
@@ -30,4 +30,8 @@ export class GetUserEventHistoryRes {
     isArray: true,
   })
   result: UserEvent[];
+  @ApiProperty({
+    type: 'number',
+  })
+  total: number;
 }

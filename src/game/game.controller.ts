@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { UserPlayGameDto } from '@app/game/dto/userPlayGame.dto';
 import { FastifyRequest } from 'fastify';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -9,7 +10,9 @@ import {
 } from '@nestjs/swagger';
 import { GetActiveGames } from '@app/game/dto/getActiveGames.dto';
 import { GameService } from '@app/game/game.service';
+import { Authorize } from '@app/utility/guard/authorization';
 @ApiTags('Game')
+@ApiBearerAuth()
 @Controller('game')
 export class GameController {
   constructor(private readonly gameService: GameService) {}
@@ -22,6 +25,7 @@ export class GameController {
   @Post('/play')
   @ApiCreatedResponse()
   @ApiOperation({ summary: 'User plays an game.' })
+  @Authorize()
   userPlayGame(@Req() req: FastifyRequest, @Body() body: UserPlayGameDto) {
     return this.gameService.userPlayGame(req.user.id, body);
   }
@@ -31,6 +35,7 @@ export class GameController {
   @ApiOkResponse({
     type: () => GetActiveGames,
   })
+  @Authorize()
   getActiveGames() {
     return this.gameService.getActiveGames();
   }

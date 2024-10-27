@@ -50,8 +50,6 @@ export class BotService {
 
   handleBotStartCommand() {
     this.bot?.start(async (ctx) => {
-      console.log(ctx);
-
       let referralToken: string | null;
 
       if (ctx.chat.type === 'private') {

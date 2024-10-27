@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GetMeResponse {
   constructor(data: GetMeResponse) {
-    Object.assign(data, this);
+    Object.assign(this, data);
   }
   @ApiProperty({
     type: 'string',

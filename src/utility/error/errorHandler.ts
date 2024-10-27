@@ -15,15 +15,14 @@ import { env } from 'process';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(private readonly logger: Logger) {}
+  constructor() {}
 
   async catch(exception: HttpException, host: ArgumentsHost) {
     // eslint-disable-next-line no-console
-    console.log(exception);
     const res = host.switchToHttp().getResponse<FastifyReply>();
 
     if (exception instanceof CustomError) {
-      this.logger.log(exception);
+      Logger.log(exception);
       return HttpService.UnsuccessfulResponse(
         res,
         exception.error.errors,
@@ -33,7 +32,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof PrismaClientKnownRequestError) {
       if (env.NODE_ENV === 'production') {
-        this.logger.log(exception);
+        Logger.log(exception);
         return HttpService.UnsuccessfulResponse(
           // runtime errors
           res,
@@ -69,23 +68,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const errResponse = exception.getResponse() as
         | string
         | {
-            message: string[];
+            status: number;
+            errors: { [key: string]: string };
           };
 
       if (errResponse instanceof Object) {
-        const multiMessage = errResponse.message;
-
-        if (multiMessage.length && Array.isArray(multiMessage)) {
-          multiMessage?.forEach((message: string) => {
-            errors.push({
-              message,
-            });
-          });
-        } else {
+        Object.values(errResponse.errors).forEach((item) => {
           errors.push({
-            message: exception.message,
+            message: item,
           });
-        }
+        });
       } else {
         errors.push({
           message: exception.message,

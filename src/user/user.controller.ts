@@ -1,5 +1,10 @@
 import { Controller, Get, Query, Req } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 import {
   GetUserGameHistoryDto,
@@ -12,7 +17,9 @@ import {
 import { GetMeResponse } from '@app/user/dto/getMe.dto';
 import { GetUserReferralsHistoryRes } from '@app/user/dto/getUserReferrals.dto';
 import { UserService } from '@app/user/user.service';
+import { Authorize } from '@app/utility/guard/authorization';
 @ApiTags('User')
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -21,6 +28,7 @@ export class UserController {
     type: () => GetMeResponse,
   })
   @ApiOperation({ summary: 'Get user information.' })
+  @Authorize()
   @Get('/me')
   getUserInformation(@Req() req: FastifyRequest) {
     return this.userService.getUserInformation(req.user.id);
@@ -31,6 +39,7 @@ export class UserController {
   @ApiOkResponse({
     type: () => GetUserGameHistoryRes,
   })
+  @Authorize()
   getUserGameHistory(
     @Req() req: FastifyRequest,
     @Query() query: GetUserGameHistoryDto,
@@ -43,6 +52,7 @@ export class UserController {
   @ApiOkResponse({
     type: () => GetUserEventHistoryRes,
   })
+  @Authorize()
   getUserEventHistory(
     @Req() req: FastifyRequest,
     @Query() query: GetUserEventHistoryDto,
@@ -55,6 +65,7 @@ export class UserController {
   @ApiOkResponse({
     type: () => GetUserReferralsHistoryRes,
   })
+  @Authorize()
   getUserReferrals(
     @Req() req: FastifyRequest,
     @Query() query: GetUserEventHistoryDto,

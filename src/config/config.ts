@@ -19,5 +19,6 @@ export const AppConfig = registerAs(CONFIG_NAME.APP_CONFIG, (): IAppConfig => {
       ? Number(env.JWT_EXPIRATION)
       : 3 * 60 * 60,
     jwtSecret: env.JWT_SECRET || 'topsecret',
+    headerAccessTokenKey: env.HEADER_ACCESS_TOKEN_KEY || 'authorization',
   };
 });

@@ -22,7 +22,7 @@ export class GetUserGameHistoryDto extends PaginationDto {
 }
 export class GetUserGameHistoryRes {
   constructor(data: GetUserGameHistoryRes) {
-    Object.assign(data, this);
+    Object.assign(this, data);
   }
 
   @ApiProperty({
@@ -30,4 +30,8 @@ export class GetUserGameHistoryRes {
     isArray: true,
   })
   result: UserGameDto[];
+  @ApiProperty({
+    type: 'number',
+  })
+  total: number;
 }

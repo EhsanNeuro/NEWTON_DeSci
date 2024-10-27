@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GetActiveEvents {
   constructor(data: GetActiveEvents) {
-    Object.assign(data, this);
+    Object.assign(this, data);
   }
 
   @ApiProperty({ type: () => EventDto, isArray: true })

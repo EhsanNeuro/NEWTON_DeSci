@@ -25,45 +25,46 @@ export class UserService {
         'NOT_FOUND',
       );
     }
-    const firstName = user.UserEvent[0].firstName
-      ? user.UserEvent[0].firstName
+
+    const firstName = user.UserEvent.length
+      ? user.UserEvent?.[0].firstName
       : user.firstName;
 
-    const lastName = user.UserEvent[0].lastName
-      ? user.UserEvent[0].lastName
+    const lastName = user.UserEvent.length
+      ? user.UserEvent?.[0].lastName
       : user.lastName;
     return new GetMeResponse({
       firstName,
       lastName,
-      email: user.UserEvent[0].email,
-      university: user.UserEvent[0].university,
-      major: user.UserEvent[0].major,
+      email: user.UserEvent[0]?.email,
+      university: user.UserEvent[0]?.university,
+      major: user.UserEvent[0]?.major,
     });
   }
 
   async getUserGameHistory(userId: number, filters: GetUserGameHistoryDto) {
-    const userGameHistory = await this.userRepo.findUserGameByQuery(
-      userId,
-      filters,
-    );
+    const { data: userGameHistory, count } =
+      await this.userRepo.findUserGameByQuery(userId, filters);
 
-    return new GetUserGameHistoryRes({ result: userGameHistory });
+    return new GetUserGameHistoryRes({ result: userGameHistory, total: count });
   }
 
   async getUserEventHistory(userId: number, filters: GetUserGameHistoryDto) {
-    const userEventHistory = await this.userRepo.findUserEventByQuery(
-      userId,
-      filters,
-    );
+    const { data: userEventHistory, count } =
+      await this.userRepo.findUserEventByQuery(userId, filters);
 
-    return new GetUserEventHistoryRes({ result: userEventHistory });
+    return new GetUserEventHistoryRes({
+      result: userEventHistory,
+      total: count,
+    });
   }
 
   async getUserReferrals(userId: number, filters: GetUserGameHistoryDto) {
-    const userReferralsHistory = await this.userRepo.findUserReferralsByQuery(
-      userId,
-      filters,
-    );
-    return new GetUserReferralsHistoryRes({ result: userReferralsHistory });
+    const { data: userReferralsHistory, count } =
+      await this.userRepo.findUserReferralsByQuery(userId, filters);
+    return new GetUserReferralsHistoryRes({
+      result: userReferralsHistory,
+      total: count,
+    });
   }
 }

@@ -35,7 +35,8 @@ export class UserReferralDto {
   @ApiProperty({
     type: 'string',
     format: 'date-time',
-    required: true,
+    required: false,
+    nullable: true,
   })
-  updatedAt: Date;
+  updatedAt?: Date | null;
 }

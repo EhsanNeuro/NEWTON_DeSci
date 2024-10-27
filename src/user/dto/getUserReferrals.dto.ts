@@ -22,11 +22,16 @@ export class GetUserReferralsHistoryDto extends PaginationDto {
 }
 export class GetUserReferralsHistoryRes {
   constructor(data: GetUserReferralsHistoryRes) {
-    Object.assign(data, this);
+    Object.assign(this, data);
   }
   @ApiProperty({
     type: () => UserReferralDto,
     isArray: true,
   })
   result: UserReferralDto[];
+
+  @ApiProperty({
+    type: 'number',
+  })
+  total: number;
 }

@@ -57,7 +57,7 @@ export class UserRepository {
     });
   }
 
-  findUserGameByQuery(
+  async findUserGameByQuery(
     userId: number,
     filters: {
       from?: string;
@@ -90,7 +90,8 @@ export class UserRepository {
         ];
       }
     }
-    return this.prisma.userGame.findMany({
+
+    const data = await this.prisma.userGame.findMany({
       where: query,
       take: limit,
       skip: offset,
@@ -102,9 +103,13 @@ export class UserRepository {
         updatedAt: true,
       },
     });
+    const count = await this.prisma.userGame.count({
+      where: query,
+    });
+    return { data, count };
   }
 
-  findUserEventByQuery(
+  async findUserEventByQuery(
     userId: number,
     filters: {
       from?: string;
@@ -137,7 +142,7 @@ export class UserRepository {
         ];
       }
     }
-    return this.prisma.userEvent.findMany({
+    const data = await this.prisma.userEvent.findMany({
       where: query,
       take: limit,
       skip: offset,
@@ -152,9 +157,13 @@ export class UserRepository {
         lastName: true,
       },
     });
+    const count = await this.prisma.userEvent.count({
+      where: query,
+    });
+    return { data, count };
   }
 
-  findUserReferralsByQuery(
+  async findUserReferralsByQuery(
     userId: number,
     filters: {
       from?: string;
@@ -187,7 +196,7 @@ export class UserRepository {
         ];
       }
     }
-    return this.prisma.userReferral.findMany({
+    const data = await this.prisma.userReferral.findMany({
       where: query,
       take: limit,
       skip: offset,
@@ -203,5 +212,9 @@ export class UserRepository {
         updatedAt: true,
       },
     });
+    const count = await this.prisma.userReferral.count({
+      where: query,
+    });
+    return { data, count };
   }
 }

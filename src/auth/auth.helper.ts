@@ -2,7 +2,6 @@ import { CONFIG_NAME, IAppConfig } from '@app/config/config.interface';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
 import { createHmac } from 'crypto';
 
 @Injectable()
@@ -29,7 +28,7 @@ export class AuthHelper {
     return hash === hmacHash;
   }
 
-  getJwtToken(user: User) {
+  getJwtToken(user: { id: number }) {
     const expirationTime = this.config.get<IAppConfig>(
       CONFIG_NAME.APP_CONFIG,
     )?.jwtExpiration;

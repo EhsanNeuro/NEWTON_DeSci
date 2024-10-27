@@ -5,7 +5,11 @@ import { AuthController } from '@app/auth/auth.controller';
 import { AuthService } from '@app/auth/auth.service';
 
 @Module({
-  imports: [JwtModule.register({})],
+  imports: [
+    JwtModule.register({
+      global: true,
+    }),
+  ],
   controllers: [AuthController],
   providers: [AuthService, AuthHelper],
 })

@@ -12,6 +12,7 @@ export interface IAppConfig {
   webappUrl: string;
   jwtExpiration: number;
   jwtSecret: string;
+  headerAccessTokenKey: string;
 }
 export enum CONFIG_NAME {
   APP_CONFIG = 'AppConfig',

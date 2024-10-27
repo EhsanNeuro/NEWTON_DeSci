@@ -12,7 +12,7 @@ export class LoginUserDto {
 }
 export class LoginUserRes {
   constructor(data: LoginUserRes) {
-    Object.assign(data, this);
+    Object.assign(this, data);
   }
   @ApiProperty({
     type: 'string',
