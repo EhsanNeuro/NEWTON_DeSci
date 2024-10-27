@@ -1,3 +1,8 @@
+import {
+  botStartFailureMessage,
+  startGameMessage,
+  welcomeDescription,
+} from '@app/bot/bot.messages';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -21,18 +26,22 @@ export class BotService {
   async bootstrap() {
     if (this.appConfig.proxyAddress) {
       this.bot = new Telegraf(this.appConfig.telegramClientId, {
+        handlerTimeout: 10_000, // 10s in ms
         telegram: {
           agent: new HttpsProxyAgent(this.appConfig.proxyAddress),
         },
       });
     } else {
-      this.bot = new Telegraf(this.appConfig.telegramClientId, {});
+      this.bot = new Telegraf(this.appConfig.telegramClientId, {
+        handlerTimeout: 10_000, // 10s in ms
+      });
     }
+    this.handleBotStartCommand();
     await this.bot.launch();
     Logger.log('Telegram bot started successfully');
   }
   async onModuleInit() {
-    // await this.bootstrap();
+    await this.bootstrap();
   }
 
   onModuleDestroy() {
@@ -41,6 +50,8 @@ export class BotService {
 
   handleBotStartCommand() {
     this.bot?.start(async (ctx) => {
+      console.log(ctx);
+
       let referralToken: string | null;
 
       if (ctx.chat.type === 'private') {
@@ -51,6 +62,7 @@ export class BotService {
         }
 
         const telegramId = ctx.chat.id;
+
         let user = await this.userRepo.findUserByTelegramId(telegramId);
         const name =
           ctx.chat.first_name || ctx.chat.last_name || ctx.chat.username || '';
