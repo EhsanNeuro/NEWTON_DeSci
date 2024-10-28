@@ -3,7 +3,8 @@ import { ITelegramUser } from '@app/auth/auth.interface';
 import { LoginUserDto } from '@app/auth/dto/loginUser.dto';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { generateError } from '@app/utility/error/errorGenerator';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
     private readonly userRepo: UserRepository,
   ) {}
   async userLogin(data: LoginUserDto) {
-    const { initData } = data;
+    const { initData, referralToken } = data;
 
     const decodedInitData = new URLSearchParams(initData);
 
@@ -59,14 +60,39 @@ export class AuthService {
     const telegramId = parsedUser.id;
     const user = await this.userRepo.findUserByTelegramId(telegramId);
     if (!user) {
-      throw generateError(
-        [
-          {
-            message: 'USER_NOT_FOUND',
+      const firstName = parsedUser.first_name;
+      const lastName = parsedUser.last_name;
+      const newUser = await this.userRepo.createUser({
+        referralToken: randomUUID(),
+        telegramId,
+        firstName,
+        lastName,
+      });
+      await this.userRepo
+        .addUserReferral({
+          Friend: {
+            connect: {
+              id: newUser.id,
+            },
           },
-        ],
-        'NOT_FOUND',
-      );
+          Owner: {
+            connect: {
+              referralToken,
+            },
+          },
+        })
+        .catch((err) => {
+          Logger.error(
+            `Create referral User failed. referralToken = ${referralToken}`,
+            err,
+          );
+        });
+      const { token, expirationTime } = this.authHelper.getJwtToken(newUser);
+
+      return {
+        access_token: token,
+        expirationTime,
+      };
     }
     const { token, expirationTime } = this.authHelper.getJwtToken(user);
 
