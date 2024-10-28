@@ -41,7 +41,9 @@ export class BotService {
     Logger.log('Telegram bot started successfully');
   }
   async onModuleInit() {
-    await this.bootstrap();
+    this.bootstrap().catch((err) => {
+      Logger.error(err);
+    });
   }
 
   onModuleDestroy() {
@@ -50,6 +52,8 @@ export class BotService {
 
   handleBotStartCommand() {
     this.bot?.start(async (ctx) => {
+      console.log(ctx);
+
       let referralToken: string | null;
 
       if (ctx.chat.type === 'private') {
@@ -58,6 +62,7 @@ export class BotService {
         if (referralToken?.length > 60) {
           referralToken = null;
         }
+        console.log('===========', referralToken);
 
         const telegramId = ctx.chat.id;
 
