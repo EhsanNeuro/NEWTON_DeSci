@@ -38,4 +38,10 @@ export class GameDto {
     required: true,
   })
   iteration: number;
+  @ApiProperty({
+    type: 'number',
+    required: false,
+    nullable: true,
+  })
+  winningResult?: number | null;
 }

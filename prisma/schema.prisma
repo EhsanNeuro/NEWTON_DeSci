@@ -23,19 +23,40 @@ model User {
   UserGame           UserGame[]
   UserReferralOwner  UserReferral[] @relation("owner")
   UserReferralFriend UserReferral[] @relation("friend")
+  telegramData       Json?          @db.Json
   createdAt          DateTime       @default(now())
   updatedAt          DateTime?      @updatedAt
 }
 
 model Game {
-  id         Int        @id @default(autoincrement()) @db.UnsignedInt
-  name       String     @db.VarChar(256)
-  type       String     @db.VarChar(128)
-  iteration  Int        @default(0) @db.UnsignedInt
-  startAt    DateTime   @db.Timestamp()
-  endAt      DateTime   @db.Timestamp()
-  rewardType String     @db.VarChar(128)
-  UserGame   UserGame[]
+  id            Int            @id @default(autoincrement()) @db.UnsignedInt
+  name          String         @db.VarChar(256)
+  type          String         @db.VarChar(128)
+  iteration     Int            @default(0) @db.UnsignedInt
+  startAt       DateTime       @db.Timestamp()
+  endAt         DateTime       @db.Timestamp()
+  rewardType    String         @db.VarChar(128)
+  UserGame      UserGame[]
+  GamePrizePool GamePrizePool?
+  calcResult    Boolean?       @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model GamePrizePool {
+  id                  Int    @id @default(autoincrement()) @db.UnsignedInt
+  inputStart          Float  @db.Double
+  inputEnd            Float  @db.Double
+  prizePool           Float  @db.Double
+  winnerRewardRatio   Float  @db.Float
+  participationReward Float  @db.Double
+  otherRewardRatio    Float  @db.Double
+  winningResult       Float? @db.Double
+  diff                Float? @db.Double
+  secondToken         Int?   @db.UnsignedInt
+  GameId              Int    @unique @db.UnsignedInt
+  Game                Game   @relation(fields: [GameId], references: [id], onDelete: Cascade)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
@@ -81,7 +102,8 @@ model UserGame {
   GameId   Int   @db.UnsignedInt
   Game     Game  @relation(fields: [GameId], references: [id], onDelete: Cascade)
   reward   Int   @default(0) @db.UnsignedInt
-  response Json? @db.Json
+  response Float @db.Double
+  metaData Json? @db.Json
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt

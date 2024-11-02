@@ -20,5 +20,8 @@ export const AppConfig = registerAs(CONFIG_NAME.APP_CONFIG, (): IAppConfig => {
       : 3 * 60 * 60,
     jwtSecret: env.JWT_SECRET || 'topsecret',
     headerAccessTokenKey: env.HEADER_ACCESS_TOKEN_KEY || 'authorization',
+    gameResultQueueIntervale: env.GAME_RESULT_QUEUE_INTERVALE
+      ? Number(env.GAME_RESULT_QUEUE_INTERVALE)
+      : 5, // mins
   };
 });

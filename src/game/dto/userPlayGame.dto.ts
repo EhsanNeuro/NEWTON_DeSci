@@ -16,5 +16,5 @@ export class UserPlayGameDto {
   })
   @IsNotEmpty()
   @IsString()
-  response: string;
+  response: number;
 }

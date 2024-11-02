@@ -96,7 +96,15 @@ export class UserRepository {
       take: limit,
       skip: offset,
       select: {
-        Game: true,
+        Game: {
+          include: {
+            GamePrizePool: {
+              select: {
+                winningResult: true,
+              },
+            },
+          },
+        },
         reward: true,
         response: true,
         createdAt: true,

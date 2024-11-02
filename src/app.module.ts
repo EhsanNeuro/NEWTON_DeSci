@@ -9,6 +9,9 @@ import { UserModule } from '@app/user/user.module';
 import { AuthModule } from '@app/auth/auth.module';
 import { GameModule } from '@app/game/game.module';
 import { EventModule } from '@app/event/event.module';
+import { BullModule } from '@nestjs/bullmq';
+import { env } from 'process';
+import { QueueModule } from '@app/queue/queue.module';
 
 @Module({
   imports: [
@@ -16,6 +19,13 @@ import { EventModule } from '@app/event/event.module';
       isGlobal: true,
       load: [AppConfig],
     }),
+    BullModule.forRoot({
+      connection: {
+        host: env.REDIS_HOST || 'localhost',
+        port: env.REDIS_PORT ? Number(env.REDIS_PORT) : 6379,
+      },
+    }),
+    QueueModule,
     BotModule,
     DatabaseModule,
     UserModule,

@@ -46,7 +46,18 @@ export class UserService {
     const { data: userGameHistory, count } =
       await this.userRepo.findUserGameByQuery(userId, filters);
 
-    return new GetUserGameHistoryRes({ result: userGameHistory, total: count });
+    return new GetUserGameHistoryRes({
+      result: userGameHistory.map((item) => {
+        return {
+          ...item,
+          Game: {
+            ...item.Game,
+            winningResult: item.Game.GamePrizePool?.winningResult,
+          },
+        };
+      }),
+      total: count,
+    });
   }
 
   async getUserEventHistory(userId: number, filters: GetUserGameHistoryDto) {
