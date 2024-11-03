@@ -35,6 +35,12 @@ export class EventRepository {
     return this.prisma.event.findUnique({
       where: {
         id: eventId,
+        startAt: {
+          lte: new Date(),
+        },
+        endAt: {
+          gte: new Date(),
+        },
       },
       include: {
         UserEvent: {

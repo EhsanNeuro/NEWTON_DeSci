@@ -23,6 +23,12 @@ export class GameRepository {
     return this.prisma.game.findUnique({
       where: {
         id: gameId,
+        startAt: {
+          lte: new Date(),
+        },
+        endAt: {
+          gte: new Date(),
+        },
       },
       include: {
         UserGame: {
