@@ -46,13 +46,13 @@ export const winstonConfig: WinstonModuleOptions = {
   format: combine(timestamp(), errors({ stack: true }), simple()),
   exitOnError: false,
   transports: [
-    new transports.File({
-      filename: `./logs/${'develope'}.log`,
-    }),
-    new transports.File({
-      filename: `./logs/${'develope'}-errors.log`,
-      level: 'error',
-    }),
+    // new transports.File({
+    //   filename: `./logs/${'develope'}.log`,
+    // }),
+    // new transports.File({
+    //   filename: `./logs/${'develope'}-errors.log`,
+    //   level: 'error',
+    // }),
     new transports.Console({
       format: combine(timestamp(), objectStringFormat),
     }),

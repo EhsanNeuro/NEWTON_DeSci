@@ -1,0 +1,22 @@
+FROM node:iron AS base
+
+# Config
+WORKDIR /app
+RUN npm i -g pnpm prisma
+
+# Install
+COPY . .
+RUN ls -la
+RUN pnpm install
+
+# Build
+RUN pnpm prisma generate
+RUN pnpm run build
+
+# Initalize database
+
+# Run
+FROM base AS runner
+CMD [ "pnpm", "run", "start:prod" ]
+
+# Done 🐍
