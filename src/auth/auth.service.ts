@@ -67,6 +67,7 @@ export class AuthService {
         telegramId,
         firstName,
         lastName,
+        telegramData: telegramUser,
       });
       await this.userRepo
         .addUserReferral({

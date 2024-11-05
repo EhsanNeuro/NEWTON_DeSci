@@ -6,6 +6,7 @@ import {
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InputJsonObject } from '@prisma/client/runtime/library';
 import { randomUUID } from 'crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { CONFIG_NAME, IAppConfig } from 'src/config/config.interface';
@@ -75,6 +76,7 @@ export class BotService {
             telegramId,
             firstName,
             lastName,
+            telegramData: JSON.stringify(ctx.chat),
           });
         }
 
