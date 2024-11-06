@@ -12,7 +12,6 @@ RUN pnpm install
 # Build
 RUN pnpm prisma generate
 RUN pnpm run build
-RUN ls -la
 # Initalize database
 
 # Run
