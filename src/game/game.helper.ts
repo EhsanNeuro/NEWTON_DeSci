@@ -23,13 +23,14 @@ export class GameHelper {
     }
     const winner = await this.gameRepo.findHighestUniqueWinner(gameId);
 
-    if (!winner.length) {
-      // There is no winner so nobody gets the reward
-      return;
-    }
-
-    const winnerReward = prizePoll.prizePool * prizePoll.winnerRewardRatio;
     await this.gameRepo.prisma.$transaction(async (prisma) => {
+      if (!winner.length) {
+        // There is no winner so nobody gets the reward
+        await this.gameRepo.addGameWinningResult(gameId, 0, prisma);
+        return;
+      }
+
+      const winnerReward = prizePoll.prizePool * prizePoll.winnerRewardRatio;
       await this.gameRepo.addUserReward(
         Number(winner[0].UserId),
         gameId,
@@ -112,6 +113,8 @@ export class GameHelper {
           winner[0].response,
           prisma,
         );
+      } else {
+        await this.gameRepo.addGameWinningResult(gameId, 0, prisma);
       }
     });
   }
