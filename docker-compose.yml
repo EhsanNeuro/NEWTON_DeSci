@@ -8,6 +8,8 @@ services:
     depends_on:
       - bot-redis
       - bot-mysql
+    volumes:
+      - .:/app/
     ports:
       - '3000:3000'
     env_file:

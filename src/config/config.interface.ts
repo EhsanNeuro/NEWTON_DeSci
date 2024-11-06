@@ -14,6 +14,7 @@ export interface IAppConfig {
   jwtSecret: string;
   headerAccessTokenKey: string;
   gameResultQueueIntervale: number;
+  appMode: string;
 }
 export enum CONFIG_NAME {
   APP_CONFIG = 'AppConfig',

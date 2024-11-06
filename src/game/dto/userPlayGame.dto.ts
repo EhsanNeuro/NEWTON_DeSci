@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class UserPlayGameDto {
   @ApiProperty({
@@ -11,10 +11,10 @@ export class UserPlayGameDto {
   gameId: number;
 
   @ApiProperty({
-    type: 'string',
+    type: 'number',
     required: true,
   })
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   response: number;
 }

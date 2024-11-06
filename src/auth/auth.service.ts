@@ -1,9 +1,12 @@
 import { AuthHelper } from '@app/auth/auth.helper';
 import { ITelegramUser } from '@app/auth/auth.interface';
 import { LoginUserDto } from '@app/auth/dto/loginUser.dto';
+import { LoginUserForTestDto } from '@app/auth/dto/loginUserForTest.dto';
+import { CONFIG_NAME, IAppConfig } from '@app/config/config.interface';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { generateError } from '@app/utility/error/errorGenerator';
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -11,6 +14,7 @@ export class AuthService {
   constructor(
     private readonly authHelper: AuthHelper,
     private readonly userRepo: UserRepository,
+    private readonly config: ConfigService,
   ) {}
   async userLogin(data: LoginUserDto) {
     const { initData, referralToken } = data;
@@ -94,6 +98,38 @@ export class AuthService {
         access_token: token,
         expirationTime,
       };
+    }
+    const { token, expirationTime } = this.authHelper.getJwtToken(user);
+
+    return {
+      access_token: token,
+      expirationTime,
+    };
+  }
+
+  async loginUserForTest(data: LoginUserForTestDto) {
+    if (
+      this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)?.appMode !== 'test'
+    ) {
+      throw generateError(
+        [
+          {
+            message: 'This api is just for test mode',
+          },
+        ],
+        'FORBIDDEN',
+      );
+    }
+    const user = await this.userRepo.findUserById(data.id);
+    if (!user) {
+      throw generateError(
+        [
+          {
+            message: 'USER_NOT_FOUND',
+          },
+        ],
+        'NOT_FOUND',
+      );
     }
     const { token, expirationTime } = this.authHelper.getJwtToken(user);
 
