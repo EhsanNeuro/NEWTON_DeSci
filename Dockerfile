@@ -6,7 +6,6 @@ RUN npm i -g pnpm prisma
 
 # Install
 COPY . .
-RUN ls -la
 RUN pnpm install
 
 # Build
