@@ -1,4 +1,9 @@
+import { BotService } from '@app/bot/bot.service';
+import { GameRepository } from '@app/database/repositories/game/game.repository';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
+import { EXTERNAL_REWARD_NAME } from '@app/general/general.interface';
+import { ApplyExternalRewardDto } from '@app/user/dto/applyExternalReward.dto';
+import { GetExternalRewardRes } from '@app/user/dto/getExternalRewards.dto';
 import { GetMeResponse } from '@app/user/dto/getMe.dto';
 import { GetUserEventHistoryRes } from '@app/user/dto/getUserEventHistory.dto';
 import {
@@ -11,7 +16,11 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepo: UserRepository) {}
+  constructor(
+    private readonly userRepo: UserRepository,
+    private readonly gameRepo: GameRepository,
+    private readonly botService: BotService,
+  ) {}
   async getUserInformation(userId: number) {
     const user = await this.userRepo.findUserById(userId);
 
@@ -33,12 +42,15 @@ export class UserService {
     const lastName = user.UserEvent.length
       ? user.UserEvent?.[0].lastName
       : user.lastName;
+    const totalTokens = await this.gameRepo.getUserTotalTokens(user.id);
     return new GetMeResponse({
       firstName,
       lastName,
       email: user.UserEvent[0]?.email,
       university: user.UserEvent[0]?.university,
       major: user.UserEvent[0]?.major,
+      loginStreak: user.loginStreak,
+      tokens: totalTokens._sum.reward || 0,
     });
   }
 
@@ -48,11 +60,14 @@ export class UserService {
 
     return new GetUserGameHistoryRes({
       result: userGameHistory.map((item) => {
+        const { Game } = item;
+        const { _count, ...rest } = Game;
         return {
           ...item,
           Game: {
-            ...item.Game,
+            ...rest,
             winningResult: item.Game.GamePrizePool?.winningResult,
+            players: _count.UserGame,
           },
         };
       }),
@@ -77,5 +92,83 @@ export class UserService {
       result: userReferralsHistory,
       total: count,
     });
+  }
+
+  async getExternalReward(userId: number) {
+    const externalRewards = await this.userRepo.getExternalRewards(userId);
+    return new GetExternalRewardRes({
+      result: externalRewards.map((item) => {
+        return {
+          isAppliedByUser: !!item.UserExternalReward.length,
+          name: item.name,
+          reward: item.reward,
+        };
+      }),
+    });
+  }
+
+  async applyExternalReward(userId: number, data: ApplyExternalRewardDto) {
+    const user = await this.userRepo.findUserById(userId);
+
+    if (!user) {
+      throw generateError(
+        [
+          {
+            message: 'USER_NOT_FOUND',
+          },
+        ],
+        'NOT_FOUND',
+      );
+    }
+
+    const isRewardExists = await this.userRepo.findExternalReward(
+      userId,
+      data.name,
+    );
+
+    if (!isRewardExists) {
+      throw generateError(
+        [
+          {
+            message: 'EXTERNAL_REWARD_NOTFOUND',
+          },
+        ],
+        'NOT_FOUND',
+      );
+    }
+    if (isRewardExists?.UserExternalReward.length) {
+      throw generateError(
+        [
+          {
+            message: 'REWARD_HAS_ALREADY_APPLIED',
+          },
+        ],
+        'BAD_REQUEST',
+      );
+    }
+
+    if (isRewardExists?.name === EXTERNAL_REWARD_NAME.TELEGRAM) {
+      const response = await this.botService.checkIsUserJoinedToTelegramChannel(
+        {
+          telegramId: Number(user.telegramId),
+        },
+      );
+
+      if (
+        !response ||
+        !['creator', 'member', 'administrator'].includes(response)
+      ) {
+        throw generateError(
+          [
+            {
+              message: 'User has not joined to telegram channel',
+            },
+          ],
+          'BAD_REQUEST',
+        );
+      }
+    }
+    await this.userRepo.applyExternalReward(user.id, isRewardExists.id);
+    return;
   }
 }

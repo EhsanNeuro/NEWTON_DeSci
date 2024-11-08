@@ -12,3 +12,6 @@ export type IPrismaTransaction = Omit<
 export enum QUEUE_NAME {
   GAME_RESULT = 'gameResult',
 }
+export enum EXTERNAL_REWARD_NAME {
+  TELEGRAM = 'TELEGRAM',
+}

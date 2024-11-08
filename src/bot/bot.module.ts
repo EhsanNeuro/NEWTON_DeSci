@@ -5,5 +5,6 @@ import { BotService } from 'src/bot/bot.service';
 @Module({
   imports: [DatabaseModule],
   providers: [BotService],
+  exports: [BotService],
 })
 export class BotModule {}

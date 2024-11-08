@@ -25,6 +25,7 @@ specifiers:
   class-transformer: ^0.5.1
   class-validator: ^0.14.1
   colors: ^1.4.0
+  dayjs: ^1.11.13
   eslint: ^8.42.0
   eslint-config-prettier: ^9.0.0
   eslint-plugin-prettier: ^5.0.0
@@ -64,6 +65,7 @@ dependencies:
   class-transformer: 0.5.1
   class-validator: 0.14.1
   colors: 1.4.0
+  dayjs: 1.11.13
   fastify: 5.0.0
   https-proxy-agent: 7.0.5
   nest-winston: 1.9.7_6nrdqgpp724l5xjh4tq5wsq6b4
@@ -2691,6 +2693,10 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  /dayjs/1.11.13:
+    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+    dev: false
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}

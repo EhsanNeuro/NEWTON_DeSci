@@ -13,6 +13,7 @@ import { setupSwagger } from '@app/general/setupSwagger';
 import validationOptions from '@app/utility/validation/validation.options';
 import { HttpExceptionFilter } from '@app/utility/error/errorHandler';
 import { PrismaClientExceptionFilter } from 'nestjs-prisma';
+import * as dayjs from 'dayjs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -29,6 +30,11 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   const config = app.get<ConfigService>(ConfigService);
   await setupSwagger(app);
+
+  console.log(
+    dayjs('2024-11-08T14:23:17').add(1, 'day').format('YYYY-MM-DD') >=
+      dayjs().format('YYYY-MM-DD'),
+  );
 
   await app.listen(
     {

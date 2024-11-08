@@ -129,4 +129,18 @@ export class BotService {
       }
     });
   }
+
+  async checkIsUserJoinedToTelegramChannel(data: { telegramId: number }) {
+    const { telegramId } = data;
+    let channelNameSplitted = this.appConfig.telegramChannelAddress
+      .split('/')
+      .filter((item) => item);
+    const channelName = channelNameSplitted[channelNameSplitted.length - 1];
+
+    const res = await this.bot?.telegram.getChatMember(
+      `@${channelName}`,
+      telegramId,
+    );
+    return res?.status;
+  }
 }

@@ -23,5 +23,6 @@ export const AppConfig = registerAs(CONFIG_NAME.APP_CONFIG, (): IAppConfig => {
     gameResultQueueIntervale: env.GAME_RESULT_QUEUE_INTERVALE
       ? Number(env.GAME_RESULT_QUEUE_INTERVALE)
       : 5, // mins
+    telegramChannelAddress: env.TELEGRAM_CHANNEL_ADDRESS || '',
   };
 });

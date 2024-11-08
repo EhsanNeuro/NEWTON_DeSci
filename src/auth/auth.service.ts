@@ -5,6 +5,7 @@ import { UserRepository } from '@app/database/repositories/user/user.repository'
 import { generateError } from '@app/utility/error/errorGenerator';
 import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AuthService {
@@ -67,6 +68,8 @@ export class AuthService {
         telegramId,
         firstName,
         lastName,
+        lastLogin: new Date(),
+        loginStreak: 1,
       });
       await this.userRepo
         .addUserReferral({
@@ -93,6 +96,19 @@ export class AuthService {
         access_token: token,
         expirationTime,
       };
+    }
+    if (
+      dayjs(user.lastLogin).add(1, 'day').format('YYYY-MM-DD') ===
+      dayjs().format('YYYY-MM-DD')
+    ) {
+      await this.userRepo.addUserStreak(user.id, user.loginStreak + 1);
+    } else if (
+      dayjs(user.lastLogin).add(1, 'day').format('YYYY-MM-DD') <
+      dayjs().format('YYYY-MM-DD')
+    ) {
+      await this.userRepo.addUserStreak(user.id, 1);
+    } else {
+      await this.userRepo.updateUserLastLogin(user.id);
     }
     const { token, expirationTime } = this.authHelper.getJwtToken(user);
 

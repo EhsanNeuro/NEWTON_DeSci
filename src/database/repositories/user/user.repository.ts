@@ -103,6 +103,11 @@ export class UserRepository {
                 winningResult: true,
               },
             },
+            _count: {
+              select: {
+                UserGame: true,
+              },
+            },
           },
         },
         reward: true,
@@ -224,5 +229,82 @@ export class UserRepository {
       where: query,
     });
     return { data, count };
+  }
+
+  addUserStreak(userId: number, loginStreak: number) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        loginStreak,
+        lastLogin: new Date(),
+      },
+    });
+  }
+
+  updateUserLastLogin(userId: number) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        lastLogin: new Date(),
+      },
+    });
+  }
+
+  getExternalRewards(userId: number) {
+    return this.prisma.externalReward.findMany({
+      where: {
+        isActive: true,
+      },
+      select: {
+        name: true,
+        reward: true,
+        UserExternalReward: {
+          where: {
+            UserId: userId,
+          },
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  findExternalReward(userId: number, name: string) {
+    return this.prisma.externalReward.findFirst({
+      where: {
+        isActive: true,
+        name,
+      },
+      select: {
+        name: true,
+        reward: true,
+        id: true,
+        UserExternalReward: {
+          where: {
+            UserId: userId,
+          },
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+  }
+
+  applyExternalReward(userId: number, externalRewardId: number) {
+    return this.prisma.userExternalReward.create({
+      data: {
+        ExternalRewardId: externalRewardId,
+        UserId: userId,
+      },
+    });
   }
 }

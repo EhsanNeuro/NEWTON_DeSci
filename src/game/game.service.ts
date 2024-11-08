@@ -94,7 +94,15 @@ export class GameService {
 
   async getActiveGames() {
     const activeGames = await this.gameRepo.findActiveGames();
-    return new GetActiveGames({ result: activeGames });
+    return new GetActiveGames({
+      result: activeGames.map((item) => {
+        const { _count, ...rest } = item;
+        return {
+          ...rest,
+          players: _count.UserGame,
+        };
+      }),
+    });
   }
   private async _addGameResultJob() {
     const activeJobs = await this.gameResultQueue.getDelayedCount();

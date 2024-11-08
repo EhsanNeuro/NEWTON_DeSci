@@ -58,6 +58,11 @@ export class GameRepository {
         rewardType: true,
         startAt: true,
         type: true,
+        _count: {
+          select: {
+            UserGame: true,
+          },
+        },
       },
     });
   }
@@ -199,6 +204,17 @@ export class GameRepository {
       },
       orderBy: {
         createdAt: 'asc',
+      },
+    });
+  }
+
+  getUserTotalTokens(userId: number) {
+    return this.prisma.userGame.aggregate({
+      where: {
+        UserId: userId,
+      },
+      _sum: {
+        reward: true,
       },
     });
   }

@@ -34,4 +34,16 @@ export class GetMeResponse {
     nullable: true,
   })
   major?: string | null;
+
+  @ApiProperty({
+    type: 'number',
+    required: true,
+  })
+  loginStreak: number;
+
+  @ApiProperty({
+    type: 'number',
+    required: true,
+  })
+  tokens: number;
 }
