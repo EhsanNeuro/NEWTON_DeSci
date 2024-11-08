@@ -24,5 +24,6 @@ export const AppConfig = registerAs(CONFIG_NAME.APP_CONFIG, (): IAppConfig => {
       ? Number(env.GAME_RESULT_QUEUE_INTERVALE)
       : 5, // mins
     telegramChannelAddress: env.TELEGRAM_CHANNEL_ADDRESS || '',
+    appMode: env.APP_MODE || 'production',
   };
 });

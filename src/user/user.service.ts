@@ -50,7 +50,7 @@ export class UserService {
       university: user.UserEvent[0]?.university,
       major: user.UserEvent[0]?.major,
       loginStreak: user.loginStreak,
-      tokens: totalTokens._sum.reward || 0,
+      tokens: totalTokens,
     });
   }
 

@@ -23,6 +23,12 @@ export class GameRepository {
     return this.prisma.game.findUnique({
       where: {
         id: gameId,
+        startAt: {
+          lte: new Date(),
+        },
+        endAt: {
+          gte: new Date(),
+        },
       },
       include: {
         UserGame: {
@@ -208,8 +214,8 @@ export class GameRepository {
     });
   }
 
-  getUserTotalTokens(userId: number) {
-    return this.prisma.userGame.aggregate({
+  async getUserTotalTokens(userId: number) {
+    const gameTokens = await this.prisma.userGame.aggregate({
       where: {
         UserId: userId,
       },
@@ -217,5 +223,22 @@ export class GameRepository {
         reward: true,
       },
     });
+
+    const externalRewardTokens = await this.prisma.externalReward.aggregate({
+      where: {
+        UserExternalReward: {
+          some: {
+            UserId: userId,
+          },
+        },
+      },
+      _sum: {
+        reward: true,
+      },
+    });
+
+    return (
+      (gameTokens._sum.reward || 0) + (externalRewardTokens._sum.reward || 0)
+    );
   }
 }

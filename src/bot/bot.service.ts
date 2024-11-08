@@ -75,6 +75,7 @@ export class BotService {
             telegramId,
             firstName,
             lastName,
+            telegramData: JSON.stringify(ctx.chat),
           });
         }
 
@@ -132,15 +133,20 @@ export class BotService {
 
   async checkIsUserJoinedToTelegramChannel(data: { telegramId: number }) {
     const { telegramId } = data;
-    let channelNameSplitted = this.appConfig.telegramChannelAddress
-      .split('/')
-      .filter((item) => item);
-    const channelName = channelNameSplitted[channelNameSplitted.length - 1];
+    console.log(this.appConfig.telegramChannelAddress);
 
-    const res = await this.bot?.telegram.getChatMember(
-      `@${channelName}`,
-      telegramId,
-    );
-    return res?.status;
+    if (this.appConfig.telegramChannelAddress.length) {
+      let channelNameSplitted = this.appConfig.telegramChannelAddress
+        .split('/')
+        .filter((item) => item);
+      const channelName = channelNameSplitted[channelNameSplitted.length - 1];
+
+      const res = await this.bot?.telegram
+        .getChatMember(`@${channelName}`, telegramId)
+        .catch(() => {
+          status: undefined;
+        });
+      return res?.status;
+    }
   }
 }
