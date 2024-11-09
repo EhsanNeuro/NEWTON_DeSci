@@ -1,8 +1,10 @@
 import { BotService } from '@app/bot/bot.service';
+import { CONFIG_NAME, IAppConfig } from '@app/config/config.interface';
 import { GameRepository } from '@app/database/repositories/game/game.repository';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { EXTERNAL_REWARD_NAME } from '@app/general/general.interface';
 import { ApplyExternalRewardDto } from '@app/user/dto/applyExternalReward.dto';
+import { ApplyReferralTokenDto } from '@app/user/dto/applyReferralToken.dto';
 import { GetExternalRewardRes } from '@app/user/dto/getExternalRewards.dto';
 import { GetMeResponse } from '@app/user/dto/getMe.dto';
 import { GetUserEventHistoryRes } from '@app/user/dto/getUserEventHistory.dto';
@@ -13,6 +15,7 @@ import {
 import { GetUserReferralsHistoryRes } from '@app/user/dto/getUserReferrals.dto';
 import { generateError } from '@app/utility/error/errorGenerator';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -20,6 +23,7 @@ export class UserService {
     private readonly userRepo: UserRepository,
     private readonly gameRepo: GameRepository,
     private readonly botService: BotService,
+    private readonly config: ConfigService,
   ) {}
   async getUserInformation(userId: number) {
     const user = await this.userRepo.findUserById(userId);
@@ -43,6 +47,14 @@ export class UserService {
       ? user.UserEvent?.[0].lastName
       : user.lastName;
     const totalTokens = await this.gameRepo.getUserTotalTokens(user.id);
+    let referralToken: string | null = null;
+    if (
+      user.ReferralTokenUseCount <
+      (this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)
+        ?.referralLimit as number)
+    ) {
+      referralToken = user.referralToken;
+    }
     return new GetMeResponse({
       firstName,
       lastName,
@@ -51,7 +63,8 @@ export class UserService {
       major: user.UserEvent[0]?.major,
       loginStreak: user.loginStreak,
       tokens: totalTokens,
-      referralToken: user.referralToken,
+      referralToken: referralToken,
+      hasGameAccess: !!user.UserReferralFriend.length,
     });
   }
 
@@ -172,6 +185,93 @@ export class UserService {
       }
     }
     await this.userRepo.applyExternalReward(user.id, isRewardExists.id);
+    return;
+  }
+
+  async applyReferralToken(userId: number, data: ApplyReferralTokenDto) {
+    const user = await this.userRepo.findUserById(userId);
+
+    if (!user) {
+      throw generateError(
+        [
+          {
+            message: 'USER_NOT_FOUND',
+          },
+        ],
+        'NOT_FOUND',
+      );
+    }
+    if (user.UserReferralFriend.length) {
+      throw generateError(
+        [
+          {
+            message: 'User has already referred',
+          },
+        ],
+        'NOT_FOUND',
+      );
+    }
+
+    if (user.referralToken === data.referralToken) {
+      throw generateError(
+        [
+          {
+            message: 'INVALID_REFERRAL_TOKEN',
+          },
+        ],
+        'BAD_REQUEST',
+      );
+    }
+
+    const owner = await this.userRepo.findUserByReferralToken(
+      data.referralToken,
+    );
+
+    if (!owner) {
+      throw generateError(
+        [
+          {
+            message: 'Referral user not found',
+          },
+        ],
+        'NOT_FOUND',
+      );
+    }
+
+    if (
+      owner.ReferralTokenUseCount >=
+      (this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)
+        ?.referralLimit as number)
+    ) {
+      throw generateError(
+        [
+          {
+            message: 'Referral token has reached its limit',
+          },
+        ],
+        'BAD_REQUEST',
+      );
+    }
+
+    const referral = await this.userRepo.addUserReferral({
+      Friend: {
+        connect: {
+          id: user.id,
+        },
+      },
+      Owner: {
+        connect: {
+          id: owner.id,
+        },
+      },
+      reward:
+        this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)?.referralReward ||
+        1,
+    });
+
+    if (referral) {
+      await this.userRepo.addUserReferralCount(owner.id);
+    }
     return;
   }
 }

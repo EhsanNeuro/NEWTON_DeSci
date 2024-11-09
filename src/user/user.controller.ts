@@ -21,6 +21,7 @@ import { UserService } from '@app/user/user.service';
 import { Authorize } from '@app/utility/guard/authorization';
 import { GetExternalRewardRes } from '@app/user/dto/getExternalRewards.dto';
 import { ApplyExternalRewardDto } from '@app/user/dto/applyExternalReward.dto';
+import { ApplyReferralTokenDto } from '@app/user/dto/applyReferralToken.dto';
 @ApiTags('User')
 @ApiBearerAuth()
 @Controller('user')
@@ -95,5 +96,16 @@ export class UserController {
     @Body() body: ApplyExternalRewardDto,
   ) {
     return this.userService.applyExternalReward(req.user.id, body);
+  }
+
+  @Post('/referral-token')
+  @ApiOperation({ summary: 'apply referral token.' })
+  @ApiCreatedResponse()
+  @Authorize()
+  applyReferralToken(
+    @Req() req: FastifyRequest,
+    @Body() body: ApplyReferralTokenDto,
+  ) {
+    return this.userService.applyReferralToken(req.user.id, body);
   }
 }

@@ -16,6 +16,7 @@ export interface IAppConfig {
   gameResultQueueIntervale: number;
   appMode: string;
   referralReward: number;
+  referralLimit: number;
 }
 export enum CONFIG_NAME {
   APP_CONFIG = 'AppConfig',

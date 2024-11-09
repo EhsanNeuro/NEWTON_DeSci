@@ -1,4 +1,3 @@
-import { CONFIG_NAME, IAppConfig } from '@app/config/config.interface';
 import { PrismaService } from '@app/database/database.service';
 import { IPrismaTransaction } from '@app/general/general.interface';
 import { Injectable } from '@nestjs/common';

@@ -25,9 +25,10 @@ export class GetMeResponse {
 
   @ApiProperty({
     type: 'string',
-    required: true,
+    required: false,
+    nullable: true,
   })
-  referralToken: string;
+  referralToken?: string | null;
 
   @ApiProperty({
     type: 'string',
@@ -53,4 +54,10 @@ export class GetMeResponse {
     required: true,
   })
   tokens: number;
+
+  @ApiProperty({
+    type: 'boolean',
+    required: true,
+  })
+  hasGameAccess: boolean;
 }

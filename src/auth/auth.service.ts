@@ -76,28 +76,42 @@ export class AuthService {
         loginStreak: 1,
         telegramData: telegramUser,
       });
-      await this.userRepo
-        .addUserReferral({
-          Friend: {
-            connect: {
-              id: newUser.id,
-            },
-          },
-          Owner: {
-            connect: {
-              referralToken,
-            },
-          },
-          reward:
-            this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)
-              ?.referralReward || 1,
-        })
-        .catch((err) => {
-          Logger.error(
-            `Create referral User failed. referralToken = ${referralToken}`,
-            err,
-          );
-        });
+      if (referralToken) {
+        const owner =
+          await this.userRepo.findUserByReferralToken(referralToken);
+        if (
+          owner &&
+          owner.ReferralTokenUseCount <
+            (this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)
+              ?.referralLimit as number)
+        ) {
+          const referral = await this.userRepo
+            .addUserReferral({
+              Friend: {
+                connect: {
+                  id: newUser.id,
+                },
+              },
+              Owner: {
+                connect: {
+                  referralToken,
+                },
+              },
+              reward:
+                this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)
+                  ?.referralReward || 1,
+            })
+            .catch((err) => {
+              Logger.error(
+                `Create referral User failed. referralToken = ${referralToken}`,
+                err,
+              );
+            });
+          if (referral) {
+            await this.userRepo.addUserReferralCount(owner.id);
+          }
+        }
+      }
       const { token, expirationTime } = this.authHelper.getJwtToken(newUser);
 
       return {

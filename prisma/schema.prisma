@@ -14,19 +14,20 @@ datasource db {
 }
 
 model User {
-  id                 Int                  @id @default(autoincrement()) @db.UnsignedInt
-  telegramId         BigInt               @unique @db.UnsignedBigInt
-  firstName          String?              @db.VarChar(128)
-  lastName           String?              @db.VarChar(128)
-  referralToken      String               @unique @db.VarChar(64)
-  UserEvent          UserEvent[]
-  UserGame           UserGame[]
-  UserReferralOwner  UserReferral[]       @relation("owner")
-  UserReferralFriend UserReferral[]       @relation("friend")
-  telegramData       Json?                @db.Json
-  lastLogin          DateTime?            @db.Timestamp()
-  loginStreak        Int                  @default(0) @db.UnsignedInt
-  UserExternalReward UserExternalReward[]
+  id                    Int                  @id @default(autoincrement()) @db.UnsignedInt
+  telegramId            BigInt               @unique @db.UnsignedBigInt
+  firstName             String?              @db.VarChar(128)
+  lastName              String?              @db.VarChar(128)
+  referralToken         String               @unique @db.VarChar(64)
+  ReferralTokenUseCount Int                  @default(0)
+  UserEvent             UserEvent[]
+  UserGame              UserGame[]
+  UserReferralOwner     UserReferral[]       @relation("owner")
+  UserReferralFriend    UserReferral[]       @relation("friend")
+  telegramData          Json?                @db.Json
+  lastLogin             DateTime?            @db.Timestamp()
+  loginStreak           Int                  @default(0) @db.UnsignedInt
+  UserExternalReward    UserExternalReward[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt

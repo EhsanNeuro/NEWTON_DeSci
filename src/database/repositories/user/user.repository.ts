@@ -37,6 +37,11 @@ export class UserRepository {
             university: true,
           },
         },
+        UserReferralFriend: {
+          where: {
+            FriendId: userId,
+          },
+        },
       },
     });
   }
@@ -53,6 +58,7 @@ export class UserRepository {
       },
       select: {
         id: true,
+        ReferralTokenUseCount: true,
       },
     });
   }
@@ -306,6 +312,19 @@ export class UserRepository {
       data: {
         ExternalRewardId: externalRewardId,
         UserId: userId,
+      },
+    });
+  }
+
+  addUserReferralCount(userId: number) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        ReferralTokenUseCount: {
+          increment: 1,
+        },
       },
     });
   }

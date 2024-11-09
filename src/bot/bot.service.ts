@@ -77,6 +77,39 @@ export class BotService {
             lastName,
             telegramData: JSON.stringify(ctx.chat),
           });
+          if (referralToken) {
+            const owner =
+              await this.userRepo.findUserByReferralToken(referralToken);
+            if (
+              owner &&
+              owner.ReferralTokenUseCount < this.appConfig.referralLimit
+            ) {
+              const referral = await this.userRepo
+                .addUserReferral({
+                  Friend: {
+                    connect: {
+                      id: user.id,
+                    },
+                  },
+                  Owner: {
+                    connect: {
+                      referralToken,
+                    },
+                  },
+                  reward: this.appConfig.referralReward || 1,
+                })
+                .catch((err) => {
+                  Logger.error(
+                    `Create referral User failed. referralToken = ${referralToken}`,
+                    err,
+                  );
+                });
+
+              if (referral) {
+                await this.userRepo.addUserReferralCount(owner.id);
+              }
+            }
+          }
         }
 
         await ctx.setChatMenuButton({
@@ -88,29 +121,6 @@ export class BotService {
         });
 
         if (user) {
-          if (referralToken) {
-            await this.userRepo
-              .addUserReferral({
-                Friend: {
-                  connect: {
-                    id: user.id,
-                  },
-                },
-                Owner: {
-                  connect: {
-                    referralToken,
-                  },
-                },
-                reward: this.appConfig.referralReward || 1,
-              })
-              .catch((err) => {
-                Logger.error(
-                  `Create referral User failed. referralToken = ${referralToken}`,
-                  err,
-                );
-              });
-          }
-
           await ctx.reply(welcomeDescription(name), {
             reply_markup: {
               inline_keyboard: [
@@ -138,7 +148,7 @@ export class BotService {
   }) {
     const { telegramId } = data;
     if (data.channelName?.length) {
-      let channelNameSplitted = data.channelName
+      const channelNameSplitted = data.channelName
         .split('/')
         .filter((item) => item);
       const channelName = channelNameSplitted[channelNameSplitted.length - 1];

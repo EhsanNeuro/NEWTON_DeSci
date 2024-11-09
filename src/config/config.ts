@@ -25,5 +25,6 @@ export const AppConfig = registerAs(CONFIG_NAME.APP_CONFIG, (): IAppConfig => {
       : 5, // mins
     appMode: env.APP_MODE || 'production',
     referralReward: env.REFERRAL_REWARD ? Number(env.REFERRAL_REWARD) : 1,
+    referralLimit: env.REFERRAL_LIMIT ? Number(env.REFERRAL_LIMIT) : 5,
   };
 });
