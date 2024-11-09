@@ -14,7 +14,6 @@ export interface IAppConfig {
   jwtSecret: string;
   headerAccessTokenKey: string;
   gameResultQueueIntervale: number;
-  telegramChannelAddress: string;
   appMode: string;
   referralReward: number;
 }

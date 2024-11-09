@@ -17,6 +17,13 @@ export class ExternalReward {
     required: true,
   })
   isAppliedByUser: boolean;
+
+  @ApiProperty({
+    type: 'string',
+    required: false,
+    nullable: true,
+  })
+  link?: string | null;
 }
 export class GetExternalRewardRes {
   constructor(data: GetExternalRewardRes) {

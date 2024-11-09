@@ -262,6 +262,7 @@ export class UserRepository {
       select: {
         name: true,
         reward: true,
+        link: true,
         UserExternalReward: {
           where: {
             UserId: userId,
@@ -287,6 +288,7 @@ export class UserRepository {
         name: true,
         reward: true,
         id: true,
+        link: true,
         UserExternalReward: {
           where: {
             UserId: userId,

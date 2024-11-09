@@ -28,7 +28,7 @@ export class GetMeResponse {
     required: true,
   })
   referralToken: string;
-  
+
   @ApiProperty({
     type: 'string',
     required: false,

@@ -51,7 +51,7 @@ export class UserService {
       major: user.UserEvent[0]?.major,
       loginStreak: user.loginStreak,
       tokens: totalTokens,
-      referralToken: user.referralToken
+      referralToken: user.referralToken,
     });
   }
 
@@ -103,6 +103,7 @@ export class UserService {
           isAppliedByUser: !!item.UserExternalReward.length,
           name: item.name,
           reward: item.reward,
+          link: item.link,
         };
       }),
     });
@@ -152,6 +153,7 @@ export class UserService {
       const response = await this.botService.checkIsUserJoinedToTelegramChannel(
         {
           telegramId: Number(user.telegramId),
+          channelName: isRewardExists.link,
         },
       );
 

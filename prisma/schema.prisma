@@ -133,6 +133,7 @@ model ExternalReward {
   name               String               @db.VarChar(128)
   UserExternalReward UserExternalReward[]
   isActive           Boolean?             @default(true)
+  link               String?              @db.VarChar(255)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt

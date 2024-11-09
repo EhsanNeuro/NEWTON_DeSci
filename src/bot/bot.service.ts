@@ -131,12 +131,13 @@ export class BotService {
     });
   }
 
-  async checkIsUserJoinedToTelegramChannel(data: { telegramId: number }) {
+  async checkIsUserJoinedToTelegramChannel(data: {
+    telegramId: number;
+    channelName?: string | null;
+  }) {
     const { telegramId } = data;
-    console.log(this.appConfig.telegramChannelAddress);
-
-    if (this.appConfig.telegramChannelAddress.length) {
-      let channelNameSplitted = this.appConfig.telegramChannelAddress
+    if (data.channelName?.length) {
+      let channelNameSplitted = data.channelName
         .split('/')
         .filter((item) => item);
       const channelName = channelNameSplitted[channelNameSplitted.length - 1];
