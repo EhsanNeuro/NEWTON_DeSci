@@ -101,6 +101,7 @@ export class BotService {
                     referralToken,
                   },
                 },
+                reward: this.appConfig.referralReward || 1,
               })
               .catch((err) => {
                 Logger.error(

@@ -242,18 +242,19 @@ export class GameRepository {
       },
     });
 
-    const referrals = await this.prisma.userReferral.count({
+    const referrals = await this.prisma.userReferral.aggregate({
       where: {
         OwnerId: userId,
+      },
+      _sum: {
+        reward: true,
       },
     });
 
     return (
       (gameTokens._sum.reward || 0) +
       (externalRewardTokens._sum.reward || 0) +
-      referrals *
-        (this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)?.referralReward ||
-          1)
+      (referrals._sum.reward || 0)
     );
   }
 }

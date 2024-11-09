@@ -88,6 +88,9 @@ export class AuthService {
               referralToken,
             },
           },
+          reward:
+            this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)
+              ?.referralReward || 1,
         })
         .catch((err) => {
           Logger.error(
