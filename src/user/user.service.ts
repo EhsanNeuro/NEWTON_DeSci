@@ -51,6 +51,7 @@ export class UserService {
       major: user.UserEvent[0]?.major,
       loginStreak: user.loginStreak,
       tokens: totalTokens,
+      referralToken: user.referralToken
     });
   }
 

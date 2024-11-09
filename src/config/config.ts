@@ -25,5 +25,6 @@ export const AppConfig = registerAs(CONFIG_NAME.APP_CONFIG, (): IAppConfig => {
       : 5, // mins
     telegramChannelAddress: env.TELEGRAM_CHANNEL_ADDRESS || '',
     appMode: env.APP_MODE || 'production',
+    referralReward: env.REFERRAL_REWARD ? Number(env.REFERRAL_REWARD) : 1,
   };
 });

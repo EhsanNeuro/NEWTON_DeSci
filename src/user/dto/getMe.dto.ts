@@ -22,6 +22,13 @@ export class GetMeResponse {
     nullable: true,
   })
   email?: string | null;
+
+  @ApiProperty({
+    type: 'string',
+    required: true,
+  })
+  referralToken: string;
+  
   @ApiProperty({
     type: 'string',
     required: false,

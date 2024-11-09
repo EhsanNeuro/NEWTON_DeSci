@@ -16,6 +16,7 @@ export interface IAppConfig {
   gameResultQueueIntervale: number;
   telegramChannelAddress: string;
   appMode: string;
+  referralReward: number;
 }
 export enum CONFIG_NAME {
   APP_CONFIG = 'AppConfig',

@@ -1,11 +1,16 @@
+import { CONFIG_NAME, IAppConfig } from '@app/config/config.interface';
 import { PrismaService } from '@app/database/database.service';
 import { IPrismaTransaction } from '@app/general/general.interface';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma, UserGame } from '@prisma/client';
 
 @Injectable()
 export class GameRepository {
-  constructor(readonly prisma: PrismaService) {}
+  constructor(
+    readonly prisma: PrismaService,
+    readonly config: ConfigService,
+  ) {}
 
   createGame(data: Prisma.GameCreateInput) {
     return this.prisma.game.create({
@@ -237,8 +242,18 @@ export class GameRepository {
       },
     });
 
+    const referrals = await this.prisma.userReferral.count({
+      where: {
+        OwnerId: userId,
+      },
+    });
+
     return (
-      (gameTokens._sum.reward || 0) + (externalRewardTokens._sum.reward || 0)
+      (gameTokens._sum.reward || 0) +
+      (externalRewardTokens._sum.reward || 0) +
+      referrals *
+        (this.config.get<IAppConfig>(CONFIG_NAME.APP_CONFIG)?.referralReward ||
+          1)
     );
   }
 }
