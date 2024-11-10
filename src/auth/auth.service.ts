@@ -7,8 +7,8 @@ import { UserRepository } from '@app/database/repositories/user/user.repository'
 import { generateError } from '@app/utility/error/errorGenerator';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
 import * as dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -68,7 +68,7 @@ export class AuthService {
       const firstName = parsedUser.first_name;
       const lastName = parsedUser.last_name;
       const newUser = await this.userRepo.createUser({
-        referralToken: randomUUID(),
+        referralToken: nanoid(16),
         telegramId,
         firstName,
         lastName,

@@ -6,8 +6,8 @@ import {
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { nanoid } from 'nanoid';
 import { CONFIG_NAME, IAppConfig } from 'src/config/config.interface';
 import { Telegraf } from 'telegraf';
 @Injectable()
@@ -71,7 +71,7 @@ export class BotService {
           const lastName = ctx.chat.last_name;
 
           user = await this.userRepo.createUser({
-            referralToken: randomUUID(),
+            referralToken: nanoid(16),
             telegramId,
             firstName,
             lastName,
