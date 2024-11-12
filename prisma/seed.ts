@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
+import { createReferralToken } from '@app/utility/general/generateReferralToken';
 import { faker } from '@faker-js/faker';
 import { Prisma } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
-import { nanoid } from 'nanoid';
 const prisma = new PrismaClient();
 const users: Prisma.UserCreateInput[] = [];
 
@@ -10,7 +10,7 @@ for (let i = 0; i < 10; i++) {
   users.push({
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
-    referralToken: nanoid(16),
+    referralToken: createReferralToken(faker.number.int()),
     telegramId: faker.number.bigInt(),
   });
 }

@@ -4,10 +4,10 @@ import {
   welcomeDescription,
 } from '@app/bot/bot.messages';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
+import { createReferralToken } from '@app/utility/general/generateReferralToken';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { nanoid } from 'nanoid';
 import { CONFIG_NAME, IAppConfig } from 'src/config/config.interface';
 import { Telegraf } from 'telegraf';
 @Injectable()
@@ -71,7 +71,7 @@ export class BotService {
           const lastName = ctx.chat.last_name;
 
           user = await this.userRepo.createUser({
-            referralToken: nanoid(16),
+            referralToken: createReferralToken(telegramId),
             telegramId,
             firstName,
             lastName,

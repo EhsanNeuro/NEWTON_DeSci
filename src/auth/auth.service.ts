@@ -5,10 +5,10 @@ import { LoginUserForTestDto } from '@app/auth/dto/loginUserForTest.dto';
 import { CONFIG_NAME, IAppConfig } from '@app/config/config.interface';
 import { UserRepository } from '@app/database/repositories/user/user.repository';
 import { generateError } from '@app/utility/error/errorGenerator';
+import { createReferralToken } from '@app/utility/general/generateReferralToken';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as dayjs from 'dayjs';
-import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -68,7 +68,7 @@ export class AuthService {
       const firstName = parsedUser.first_name;
       const lastName = parsedUser.last_name;
       const newUser = await this.userRepo.createUser({
-        referralToken: nanoid(16),
+        referralToken: createReferralToken(telegramId),
         telegramId,
         firstName,
         lastName,
