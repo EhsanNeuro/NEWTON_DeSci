@@ -1,159 +1,124 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '@telegram-apps/telegram-ui/dist/styles.css';
 import { AppRoot, List, Chip, Avatar, Image } from '@telegram-apps/telegram-ui';
-import { MyTabbar } from './components/MyTabbar';
-import NewtonLogo from '../src/images/apologonobg.png';
-import LoadingPage from './components/LoadingPage';
+import { MyTabbar } from './components/MyTabbar'; // Assuming you have this component
+import NewtonLogo from '../src/images/apologonobg.png'; // Assuming your logo path is correct
+import LoadingPage from './components/LoadingPage'; // Assuming you have this component
 import { retrieveLaunchParams } from '@telegram-apps/sdk';
+
 
 export const App = () => {
   const { initDataRaw } = retrieveLaunchParams();
-  const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
-  const [apiData, setApiData] = useState(null);
-  const [loading, setLoading] = useState(true);
+// Base API URL
 
-  useEffect(() => {
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    const telegramUser = tg.initDataUnsafe?.user || null;
-    setUser(telegramUser);
+    const [user, setUser] = useState(null); // Telegram user data
+    const [userData, setUserData] = useState(0); // User token balance
+    const [loading, setLoading] = useState(true); // Loading state
 
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    headers.append('Authorization', `Bearer ${initDataRaw}`);
-
-    // First authenticate
     fetch('http://37.27.29.15:3000/auth/login', {
       method: 'POST',
-      headers: headers,
+      headers: {
+        'Authorization': `tma ${initDataRaw}`, // Ensure initDataRaw contains the correct value
+        'Content-Type': 'application/json', // Required for JSON payloads
+      },
       body: JSON.stringify({
-        initData: initDataRaw,
-        referralToken: ""
+        initData: {initDataRaw}, // Replace with the actual initData value
+        referralToken: "string", // Replace with the actual referralToken value
+      }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
       })
-    })
-    .then(response => {
-      console.log('Auth response status:', response.status);
-      if (!response.ok) {
-        return response.text().then(text => {
-          throw new Error(`Auth failed: ${response.status} ${text}`);
-        });
-      }
-      return response.json();
-    })
-    .then(authData => {
-      console.log('Auth successful:', authData);
-      
-      // After auth success, try user/me
-      return fetch('http://37.27.29.15:3000/user/me', {
-        method: 'GET',
-        headers: headers
-      });
-    })
-    .then(response => {
-      console.log('User/me response status:', response.status);
-      if (!response.ok) {
-        return response.text().then(text => {
-          throw new Error(`User data failed: ${response.status} ${text}`);
-        });
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('User data received:', data);
-      setApiData(data);
-      setLoading(false);
-    })
-    .catch(err => {
-      console.error('Full error:', err);
-      setError(err.message);
-      setLoading(false);
-    });
+      .then(data => console.log('Response:', data))
+      .catch(error => console.error('Error:', error));
+    
+    useEffect(() => {
+        const tg = window.Telegram.WebApp;
 
-  }, [initDataRaw]);
+        // Initialize Telegram WebApp
+        tg.ready();
 
-  // Add network status check
-  useEffect(() => {
-    const checkConnection = () => {
-      fetch('http://37.27.29.15:3000/health', { 
-        method: 'GET',
-        mode: 'no-cors' 
-      })
-      .then(() => console.log('Server is reachable'))
-      .catch(err => console.log('Server connection error:', err));
-    };
+        // Fetch and set user data
+        const telegramUser = tg.initDataUnsafe?.user || null;
+        setUser(telegramUser);
 
-    checkConnection();
-  }, []);
+        // Fetch user token balance from backend
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get('http://37.27.29.15:3000/user/me/', {
+                    userId: telegramUser?.id,
+                });
+                setUserData(response);
+            } catch (error) {
+                console.error('Error fetching tokens:', error);
+            } finally {
+                setLoading(false); // Stop loading spinner
+            }
+        };
 
-  if (loading) {
+        if (telegramUser) {
+            fetchUser();
+        } else {
+            setLoading(false); // No user data, stop loading
+        }
+
+        // Set theme colors dynamically
+        const { secondary_bg_color } = tg.themeParams || {};
+        if (secondary_bg_color) {
+            document.body.style.backgroundColor = secondary_bg_color;
+        }
+    }, []);
+
+    if (loading) {
+        return <AppRoot><LoadingPage /></AppRoot> ;
+    }
+
     return (
-      <AppRoot>
-        <LoadingPage />
-        <div style={{ padding: 20, textAlign: 'center' }}>
-          Connecting to server...
-        </div>
-      </AppRoot>
+        <AppRoot>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100vh', // Full viewport height
+                overflow: 'hidden', // Prevent overall scrolling
+            }}>
+                {/* Fixed Header */}
+                <List style={{
+                    background: 'var(--tgui--secondary_bg_color)',
+                    padding: 10,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexShrink: 0, // Prevent shrinking
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: 25,
+                        alignItems: 'center',
+                        backgroundColor: 'var(--tgui--primary_bg_color)'
+                    }}>
+                        <Chip mode="elevated" before={<Avatar size={20} />}>
+                            {user?.first_name || 'Guest'}
+                        </Chip>
+                        <Image
+                            size={64}
+                            src={NewtonLogo}
+                            alt="App logo"
+                        />
+                        <Chip mode="elevated" before={<Avatar size={20} />}>
+                            {userData.tokens || 100}
+                        </Chip>
+                    </div>
+                </List>
+
+                {/* Tabbar Navigation */}
+                <MyTabbar />
+            </div>
+        </AppRoot>
     );
-  }
-
-  if (error) {
-    return (
-      <AppRoot>
-        <div style={{ padding: 20 }}>
-          <h3>Connection Error:</h3>
-          <p>{error}</p>
-          <p>Server Status: Checking connection...</p>
-          <details>
-            <summary>Technical Details</summary>
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-              Init Data: {initDataRaw}
-            </pre>
-          </details>
-        </div>
-      </AppRoot>
-    );
-  }
-
-  return (
-    <AppRoot>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        overflow: 'hidden',
-      }}>
-        <List style={{
-          background: 'var(--tgui--secondary_bg_color)',
-          padding: 10,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexShrink: 0,
-        }}>
-          <div style={{
-            display: 'flex',
-            gap: 25,
-            alignItems: 'center',
-          }}>
-            <Chip mode="elevated" before={<Avatar size={20} />}>
-              {user?.first_name || 'Guest'}
-            </Chip>
-            <Image
-              size={64}
-              src={NewtonLogo}
-              alt="App logo"
-            />
-            <Chip mode="outline" before={<Avatar size={20} />}>
-              {apiData?.tokens ?? 0}
-            </Chip>
-          </div>
-        </List>
-
-        <MyTabbar />
-      </div>
-    </AppRoot>
-  );
 };
 
 export default App;

@@ -31,12 +31,7 @@ function Tabs() {
           background: 'var(--tgui--primary_bg_color)',
           width: '100%',
         }}>
-            {[...Array(3)].map((_, index) => (
-                    <Cell after={<Badge type="number">+1199</Badge>}
-                    key={index}>
-                    Friend Name {index}
-                    </Cell>
-                ))}
+            
 
             </List>
                 
