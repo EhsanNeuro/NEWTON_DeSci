@@ -1,0 +1,127 @@
+import React, { useState, useEffect } from 'react';
+import '@telegram-apps/telegram-ui/dist/styles.css';
+import { AppRoot, List, Chip, Avatar, Image } from '@telegram-apps/telegram-ui';
+import { MyTabbar } from './components/MyTabbar';
+import NewtonLogo from '../src/images/apologonobg.png';
+import LoadingPage from './components/LoadingPage';
+import { retrieveLaunchParams } from '@telegram-apps/sdk';
+
+export const App = () => {
+  const { initDataRaw, initData } = retrieveLaunchParams();
+  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    const telegramUser = tg.initDataUnsafe?.user || null;
+    setUser(telegramUser);
+
+    // First try authentication
+    fetch('http://37.27.29.15:3000/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `tma ${initDataRaw}`
+      },
+      body: JSON.stringify({
+        initData: initData,
+        referralToken: "string"
+
+      })
+    })
+    .then(response => {
+      if (!response.ok) throw new Error(`Auth failed: ${response.status}`);
+      return response.json();
+    })
+    .then(() => {
+      // After successful auth, fetch user data
+      return fetch('http://37.27.29.15:3000/user/me', {
+        headers: {
+          'Authorization': `Bearer ${encodeURIComponent(initDataRaw)}`
+        }
+      });
+    })
+    .then(response => {
+      if (!response.ok) throw new Error(`User data failed: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Success:', data);
+      setApiData(data);
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error('Error details:', err);
+      setError(err.message);
+      setLoading(false);
+    });
+
+  }, [initDataRaw]);
+
+  if (loading) {
+    return <AppRoot><LoadingPage /></AppRoot>;
+  }
+
+  if (error) {
+    return (
+      <AppRoot>
+        <div style={{ padding: 20 }}>
+          <h3>Error Details:</h3>
+          <p>Error: {error}</p>
+          <p>Init Data Present: {initDataRaw ? 'Yes' : 'No'}</p>
+          <details>
+            <summary>Debug Info</summary>
+            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+              Raw: {initDataRaw}
+            </pre>
+          </details>
+        </div>
+      </AppRoot>
+    );
+  }
+
+  return (
+    <AppRoot>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        overflow: 'hidden',
+      }}>
+        <List style={{
+          background: 'var(--tgui--secondary_bg_color)',
+          padding: 10,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexShrink: 0,
+        }}>
+          <div style={{
+            display: 'flex',
+            gap: 25,
+            alignItems: 'center',
+          }}>
+            <Chip mode="elevated" before={<Avatar size={20} />}>
+              {user?.first_name || 'Guest'}
+            </Chip>
+            <Image
+              size={64}
+              src={NewtonLogo}
+              alt="App logo"
+            />
+            <Chip mode="outline" before={<Avatar size={20} />}>
+              {apiData?.tokens ?? 0}
+            </Chip>
+          </div>
+        </List>
+
+        <MyTabbar />
+      </div>
+    </AppRoot>
+  );
+};
+
+export default App;
